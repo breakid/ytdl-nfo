@@ -3,7 +3,7 @@ episodedetails:
   - showtitle: '{uploader}'
   - uniqueid:
       attr:
-        type: 'youtube:tab'
+        type: 'youtubetab'
         default: "true"
       value: '{id}'
   - plot: '{description}'

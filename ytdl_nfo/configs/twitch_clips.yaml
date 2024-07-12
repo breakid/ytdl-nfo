@@ -1,9 +1,9 @@
 episodedetails:
   - title: '{title}'
-  - showtitle: '{uploader}'
+  - showtitle: '{creator}'
   - uniqueid:
       attr:
-        type: 'twitchvod'
+        type: 'twitchclips'
         default: "true"
       value: '{id}'
   - plot: '{fulltitle}'
