@@ -7,7 +7,7 @@ from xml.dom import minidom
 
 
 class Nfo:
-    def __init__(self, extractor):
+    def __init__(self, extractor, file_path):
         self.data = None
         self.top = None
         try:
@@ -15,7 +15,7 @@ class Nfo:
             with pkg_resources.resource_stream("ytdl_nfo", extractor_path) as f:
                 self.data = yaml.load(f, Loader=yaml.FullLoader)
         except FileNotFoundError:
-            print(f"Error: No config available for extractor {extractor}")
+            print(f"Error: No config available for extractor {extractor} in file {file_path}")
     
     def config_ok(self):
         return self.data is not None
@@ -112,5 +112,5 @@ class Nfo:
         return xmlstr
 
 
-def get_config(extractor):
-    return Nfo(extractor.replace(":tab", ""))
+def get_config(extractor, file_path):
+    return Nfo(extractor, file_path)
