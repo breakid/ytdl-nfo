@@ -29,6 +29,8 @@ def main():
         for root, dirs, files in os.walk(args.input):
             for file_name in files:
                 file_path = os.path.join(root, file_name)
+                if file_name.endswith(".live_chat.json"):
+                    continue
                 if re.search(args.regex, file_name):
                     file = Ytdl_nfo(file_path, args.extractor)
                     if args.overwrite or not os.path.exists(file.get_nfo_path()):
