@@ -3,6 +3,7 @@ import ast
 import datetime as dt
 import xml.etree.ElementTree as ET
 import pkg_resources
+from collections import defaultdict
 from xml.dom import minidom
 
 
@@ -37,6 +38,12 @@ class Nfo:
         if raw_data.get("upload_date") is None:
             date = dt.datetime.fromtimestamp(raw_data["epoch"])
             raw_data["upload_date"] = date.strftime("%Y%m%d")
+        
+        # Allow missing keys to give an empty string instead of
+        # a KeyError when formatting values
+        # https://stackoverflow.com/a/21754294
+        format_dict = defaultdict(lambda: "")
+        format_dict.update(raw_data)
 
         # Check if current node is a list
         if isinstance(subtree, list):
@@ -61,9 +68,9 @@ class Nfo:
 
             # Set children if value flag
             if table:
-                children = ast.literal_eval(value.format(**raw_data))
+                children = ast.literal_eval(value.format_map(format_dict))
             else:
-                children = [value.format(**raw_data)]
+                children = [value.format_map(format_dict)]
 
             if 'convert' in attributes.keys():
                 target_type = attributes['convert']
@@ -79,9 +86,9 @@ class Nfo:
         else:
             if table:
                 children = ast.literal_eval(
-                    subtree[child_name].format(**raw_data))
+                    subtree[child_name].format_map(format_dict))
             else:
-                children = [subtree[child_name].format(**raw_data)]
+                children = [subtree[child_name].format_map(format_dict)]
 
         # Add the child node(s)
         child_name = child_name.rstrip('!')
@@ -93,7 +100,7 @@ class Nfo:
             # Add attributes
             if 'attr' in attributes.keys():
                 for attribute, attr_value in attributes['attr'].items():
-                    child.set(attribute, attr_value.format(**raw_data))
+                    child.set(attribute, attr_value.format_map(format_dict))
 
     def print_nfo(self):
         xmlstr = minidom.parseString(ET.tostring(
