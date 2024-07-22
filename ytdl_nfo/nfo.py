@@ -31,7 +31,13 @@ class Nfo:
         self.top = ET.Element(top_name)
 
         # Recursively generate the rest of the NFO
-        self.__create_child(self.top, self.data[top_name], raw_data)
+        try:
+            self.__create_child(self.top, self.data[top_name], raw_data)
+        except ValueError as e:
+            print(e)
+            return False
+
+        return True
 
     def __create_child(self, parent, subtree, raw_data):
         # Some .info.json files may not include an upload_date.
@@ -94,7 +100,17 @@ class Nfo:
         child_name = child_name.rstrip('!')
 
         for value in children:
-            child = ET.SubElement(parent, child_name)
+            sub_parent = parent
+            sub_name = child_name
+            sub_index = sub_name.find('>')
+            while sub_index > -1:
+                if not table:
+                    raise ValueError(f'Error with key {sub_name}: > deliminator can only be used for lists')
+                sub_parent = ET.SubElement(sub_parent, sub_name[:sub_index])
+                sub_name = sub_name[sub_index + 1:]
+                sub_index = sub_name.find('>')
+
+            child = ET.SubElement(sub_parent, sub_name)
             child.text = value
 
             # Add attributes

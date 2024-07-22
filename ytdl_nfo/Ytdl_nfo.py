@@ -44,9 +44,10 @@ class Ytdl_nfo:
     def process(self):
         if not self.input_ok or self.nfo is None or not self.nfo.config_ok():
             return False
-        self.nfo.generate(self.data)
-        self.write_nfo()
-        return True
+        generated = self.nfo.generate(self.data)
+        if generated:
+            self.write_nfo()
+        return generated
     
     def get_nfo_path(self):
         return f'{self.filename}.nfo'
