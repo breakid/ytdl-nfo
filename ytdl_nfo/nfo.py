@@ -94,7 +94,15 @@ class Nfo:
         child_name = child_name.rstrip('!')
 
         for value in children:
-            child = ET.SubElement(parent, child_name)
+            sub_parent = parent
+            sub_name = child_name
+            sub_index = sub_name.find('>')
+            while sub_index > -1:
+                sub_parent = ET.SubElement(sub_parent, sub_name[:sub_index])
+                sub_name = sub_name[sub_index + 1:]
+                sub_index = sub_name.find('>')
+
+            child = ET.SubElement(sub_parent, sub_name)
             child.text = value
 
             # Add attributes
