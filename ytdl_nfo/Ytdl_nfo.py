@@ -1,5 +1,6 @@
-import os
 import json
+import os
+import re
 from .nfo import get_config
 
 
@@ -10,6 +11,7 @@ class Ytdl_nfo:
         self.data = None
         self.filename = None
         self.input_ok = True
+        self.extractor = extractor
         
         # Read json data
         if self.input_ok:
@@ -20,23 +22,22 @@ class Ytdl_nfo:
                 print(f'Error: Failed to parse JSON in file {self.path}')
                 self.input_ok = False
 
-        self.extractor = extractor
-        if extractor is None and self.data is not None:
+        if self.extractor is None and self.data is not None:
             data_extractor = self.data.get('extractor')
             if isinstance(data_extractor, str):
-                self.extractor = data_extractor.lower()
+                self.extractor = re.sub(r'[:?*/\\]', '_', data_extractor.lower())
 
-        if file_path.endswith(".info.json"):
-            self.filename = file_path[:-10]
+        if self.path.endswith(".info.json"):
+            self.filename = self.path[:-10]
         elif self.data is not None:
             data_filename = self.data.get('_filename')
             if isinstance(data_filename, str):
                 self.filename = os.path.splitext(data_filename)[0]
         if self.filename is None:
-            self.filename = file_path
+            self.filename = self.path
         
         if isinstance(self.extractor, str):
-            self.nfo = get_config(self.extractor)
+            self.nfo = get_config(self.extractor, self.path)
         else:
             self.nfo = None
     

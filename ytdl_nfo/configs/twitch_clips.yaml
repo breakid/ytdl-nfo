@@ -1,0 +1,14 @@
+episodedetails:
+  - title: '{title}'
+  - showtitle: '{creator}'
+  - uniqueid:
+      attr:
+        type: 'twitchclips'
+        default: "true"
+      value: '{id}'
+  - plot: '{fulltitle}'
+  - premiered:
+      convert: 'date'
+      input_f: '%Y%m%d'
+      output_f: '%Y-%m-%d'
+      value: '{upload_date}'

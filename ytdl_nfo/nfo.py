@@ -3,11 +3,12 @@ import ast
 import datetime as dt
 import xml.etree.ElementTree as ET
 import pkg_resources
+from collections import defaultdict
 from xml.dom import minidom
 
 
 class Nfo:
-    def __init__(self, extractor):
+    def __init__(self, extractor, file_path):
         self.data = None
         self.top = None
         try:
@@ -15,7 +16,7 @@ class Nfo:
             with pkg_resources.resource_stream("ytdl_nfo", extractor_path) as f:
                 self.data = yaml.load(f, Loader=yaml.FullLoader)
         except FileNotFoundError:
-            print(f"Error: No config available for extractor {extractor}")
+            print(f"Error: No config available for extractor {extractor} in file {file_path}")
     
     def config_ok(self):
         return self.data is not None
@@ -37,6 +38,12 @@ class Nfo:
         if raw_data.get("upload_date") is None:
             date = dt.datetime.fromtimestamp(raw_data["epoch"])
             raw_data["upload_date"] = date.strftime("%Y%m%d")
+        
+        # Allow missing keys to give an empty string instead of
+        # a KeyError when formatting values
+        # https://stackoverflow.com/a/21754294
+        format_dict = defaultdict(lambda: "")
+        format_dict.update(raw_data)
 
         # Check if current node is a list
         if isinstance(subtree, list):
@@ -61,9 +68,9 @@ class Nfo:
 
             # Set children if value flag
             if table:
-                children = ast.literal_eval(value.format(**raw_data))
+                children = ast.literal_eval(value.format_map(format_dict))
             else:
-                children = [value.format(**raw_data)]
+                children = [value.format_map(format_dict)]
 
             if 'convert' in attributes.keys():
                 target_type = attributes['convert']
@@ -79,9 +86,9 @@ class Nfo:
         else:
             if table:
                 children = ast.literal_eval(
-                    subtree[child_name].format(**raw_data))
+                    subtree[child_name].format_map(format_dict))
             else:
-                children = [subtree[child_name].format(**raw_data)]
+                children = [subtree[child_name].format_map(format_dict)]
 
         # Add the child node(s)
         child_name = child_name.rstrip('!')
@@ -93,7 +100,7 @@ class Nfo:
             # Add attributes
             if 'attr' in attributes.keys():
                 for attribute, attr_value in attributes['attr'].items():
-                    child.set(attribute, attr_value.format(**raw_data))
+                    child.set(attribute, attr_value.format_map(format_dict))
 
     def print_nfo(self):
         xmlstr = minidom.parseString(ET.tostring(
@@ -112,5 +119,5 @@ class Nfo:
         return xmlstr
 
 
-def get_config(extractor):
-    return Nfo(extractor.replace(":tab", ""))
+def get_config(extractor, file_path):
+    return Nfo(extractor, file_path)
