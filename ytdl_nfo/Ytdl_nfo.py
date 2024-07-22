@@ -46,10 +46,14 @@ class Ytdl_nfo:
         self.nfo.generate(self.data)
         self.write_nfo()
         return True
-
+    
+    def get_nfo_path(self):
+        return f'{self.filename}.nfo'
+        
     def write_nfo(self):
         if self.nfo is not None and self.nfo.generated_ok():
-            self.nfo.write_nfo(f'{self.filename}.nfo')
+            nfo_path = self.get_nfo_path()
+            self.nfo.write_nfo(nfo_path)
 
     def print_data(self):
         print(json.dumps(self.data, indent=4, sort_keys=True))
