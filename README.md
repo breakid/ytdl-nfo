@@ -1,82 +1,99 @@
 # ytdl-nfo : youtube-dl NFO generator
 
-[youtube-dl](https://github.com/ytdl-org/youtube-dl) is an incredibly useful resource to download and archive footage from across the web. Viewing and organising these files however can be a bit of a hassle.
+[youtube-dl](https://github.com/ytdl-org/youtube-dl) is an incredibly useful tool for downloading and archiving footage from across the web; however, viewing and organizing these files can be a hassle.
 
-**ytdl-nfo** takes the `--write-info-json` output from youtube-dl and parses it into Kodi-compatible .nfo files. The aim is to prepare and move files so as to be easily imported into media centers such as Plex, Emby, Jellyfin, etc. 
+**ytdl-nfo** automates metadata processing so that media files can be easily imported into media centers such as [Plex](https://www.plex.tv/), [Emby](https://emby.media/), [Jellyfin](https://jellyfin.org/), etc. It does this by parsing each `.info.json` file created by youtube-dl (using the `--write-info-json` flag) and generating a Kodi-compatible `.nfo` file.
 
-**Warning**
-This package is still in early stages and breaking changes may be introduced.
-### NOTE: youtube-dl derivatives
-This package was originally built for youtube-dl, however the aim is to be compatible with related forks as well. Currently these are:
-- [youtube-dl](https://github.com/ytdl-org/youtube-dl)
-- [yt-dlp](https://github.com/yt-dlp/yt-dlp)
+While this package was originally built for youtube-dl, the goal is to maintain compatibility with related forks, such as [yt-dlp](https://github.com/yt-dlp/yt-dlp).
 
+> :warning: **Warning**: This package is still in early stages and breaking changes may be introduced.
 
 ## Installation
-Requirements: Python 3.8
-### Python 3 pipx (recommended)
-[pipx](https://github.com/pipxproject/pipx) is tool that installs a package and its dependencies in an isolated environment.
 
-1. Ensure Python 3.8 and [pipx](https://github.com/pipxproject/pipx) is installed
-2. Install with `pipx install ytdl-nfo`
+### Python 3 pipx (recommended)
+
+[pipx](https://github.com/pipxproject/pipx) is a tool that installs a package and its dependencies in an isolated environment.
+
+1. Install [Python 3.8](https://www.python.org/downloads/) (or later)
+2. Install [pipx](https://github.com/pipxproject/pipx)
+3. Run `pipx install ytdl-nfo`
 
 ### Python 3 pip
-1. Ensure Python 3.8 is installed
-2. Install with `pip install ytdl-nfo`
 
-### Package from source
-1. Ensure Python 3.8 and [Python Poetry](https://python-poetry.org/) is installed
-2. Clone the repo using `git clone https://github.com/owdevel/ytdl_nfo.git`
-3. Create a dev environment with `poetry install`
-3. Build with `poetry build`
-4. Install from the `dist` directory with `pip install ./dist/ytdl_nfo-x.x.x.tar.gz`
+1. Install [Python 3.8](https://www.python.org/downloads/) (or later)
+2. Installed [pip](https://pip.pypa.io/en/stable/installation/)
+3. Run `pip install ytdl-nfo`
 
-### Development Environment
-1. Perform steps 1-3 of package from source
-2. Run using `poetry run ytdl-nfo` or use `poetry shell` to enter the virtual env
+### Package from Source
 
+1. Install [Python 3.8](https://www.python.org/downloads/) (or later)
+2. Install [Python Poetry](https://python-poetry.org/)
+3. Clone the repo using `git clone https://github.com/owdevel/ytdl_nfo.git`
+4. Create a dev environment with `poetry install`
+5. Build with `poetry build`
+6. Install from the `dist` directory with `pip install ./dist/ytdl_nfo-x.x.x.tar.gz`
 
 ## Usage
-### Automatic
-Run `ytdl-nfo JSON_FILE` replacing `JSON_FILE` with either the path to the file you wish to convert, or a folder containing files to convert. The tool will automatically take any files ending with `.json` and convert them to `.nfo` using the included extractor templates.
 
-#### Examples
-Convert a single file
+youtube-dl uses site-specific extractors to collect technical data about a media file. This metadata, along with the extractor ID, are written to a `.info.json` file when the `--write-info-json` flag is used. ytdl-nfo uses a set of YAML configs, located in `ytdl_nfo/configs` to control how metadata from the JSON file is mapped to NFO tags.
+
+If extractor auto-detection fails or you want to override the default, use the `--extractor` option to specify a particular template. The template must be located at `ytdl_nfo/configs/<EXTRACTOR_TEMPLATE_NAME>.yaml`.
+
+```text
+python3 -m ytdl_nfo [-h] [--config] [-e EXTRACTOR] [--regex REGEX] [-w] JSON_FILE
+
+positional arguments:
+  JSON_FILE             JSON file to convert or directory to process recursively
+
+options:
+  -h, --help            show this help message and exit
+  --config              Show the path to the config directory
+  -e EXTRACTOR, --extractor EXTRACTOR
+                        Specify specific extractor
+  -r, --regex REGEX     A regular expression used to search for JSON source files
+  -w, --overwrite       Overwrite existing NFO files
+```
+
+### Examples
+
 ```bash
+# Display the configuration location
+ytdl-nfo --config
+
+# Create a single NFO file using metadata from `great_video.info.json`
 ytdl-nfo great_video.info.json
-```
 
-Convert a directory and all sub directories with `.info.json` files
-```bash
+# Create an NFO file for each `.info.json` file located in the `video_folder` directory
+# (provided a matching extractor template exists in the `ytdl_nfo/configs` directory)
 ytdl-nfo video_folder
-```
 
-### Manual
-ytdl-nfo uses a set of YAML configs to determine the output format and what data comes across. This is dependent on the extractor flag which is set by youtube-dl. Should this fail to be set or if a custom extractor is wanted there is the `--extractor` flag. ytdl-nfo will then use extractor with the given name as long as it is in the config directory with the format `custom_extractor_name.yaml`.
-
-```bash
+# Create a single NFO file using metadata from `great_video.info.json` and the `custom_extractor_name` template
 ytdl-nfo --extractor custom_extractor_name great_video.info.json
 ```
 
-#### Config Location
-Run the following command to get the configuration location.
-```bash
-ytdl-nfo --config
-```
+## Contributing
 
-## Extractors
-Issues/Pull Requests are welcome to add more youtube-dl supported extractors to the repo.
+This is a small project I started to learn how to use the Python packaging system whilst providing some useful functionality for my home server setup. Issues/Pull Requests and constructive criticism are welcome.
 
-### Custom Extractors
-Coming Soon...
+### Development Environment
+
+1. Install [Python 3.8](https://www.python.org/downloads/) (or later)
+2. Install [Python Poetry](https://python-poetry.org/)
+3. Create a fork of this repo
+4. Clone your fork using `git clone git@github.com:<YOUR_USERNAME>/ytdl-nfo.git`
+5. Change to the project directory and initialize the environment using poetry
+
+    ```bash
+    cd ytdl-nfo
+    poetry install
+    ```
+
+6. Run the application using `poetry run ytdl-nfo`, or use `poetry shell` to enter the virtual env
 
 ## Todo
+
 - [ ] Add try catches to pretty print errors
 - [ ] Documentation and templates for creating custom extractors
-- [ ] Documentation of CLI arguments
+- [x] Documentation of CLI arguments
 - [x] Recursive folder searching
 - [x] Add package to pypi
-
-## Authors Note
-This is a small project I started to learn how to use python packaging system whilst providing some useful functionality for my home server setup.
-Issues/pull requests and constructive criticism is welcome.
