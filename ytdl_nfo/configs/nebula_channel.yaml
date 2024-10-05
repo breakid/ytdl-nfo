@@ -1,0 +1,20 @@
+tvshow:
+  - title: '{title}'
+  - sorttitle: '{title}'
+  - season: '-1'
+  - episode: '-1'
+  - year:
+      convert: 'date'
+      value: '{upload_date}'
+      input_f: '%Y%m%d'
+      output_f: '%Y'
+  - displayorder: 'aired'
+  - outline: '{description}'
+  - plot: '{description}'
+  - genre: 'Nebula'
+  - uniqueid:
+      attr:
+        type: 'nebula'
+        default: 'true'
+      value: '{id}'
+  - nebulaid: '{id}'
