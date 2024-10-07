@@ -1,0 +1,30 @@
+episodedetails:
+  - title: '{title}'
+  - showtitle: '{uploader}'
+  - season:
+      convert: 'date'
+      value: '{upload_date}'
+      input_f: '%Y%m%d'
+      output_f: '%Y'
+  - episode:
+      convert: 'date'
+      value: '{upload_date}'
+      input_f: '%Y%m%d'
+      output_f: '%m%d'
+  - year:
+      convert: 'date'
+      value: '{upload_date}'
+      input_f: '%Y%m%d'
+      output_f: '%Y'
+  - aired:
+      convert: 'date'
+      value: '{upload_date}'
+      input_f: '%Y%m%d'
+      output_f: '%Y-%m-%d'
+  - plot: '{description}'
+  - genre: '{extractor_key}'
+  - uniqueid:
+      attr:
+        type: 'nebula'
+        default: 'true'
+      value: '{channel_id}'
