@@ -1,6 +1,4 @@
-#!/usr/bin/env python
+from . import main
 
-import ytdl_nfo
-
-if __name__ == '__main__':
-    ytdl_nfo.main()
+if __name__ == "__main__":
+    main()
